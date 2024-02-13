@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wordflipzz</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      height: 100vh;
+      margin: 0;
+      background-color: #ff7676;
+    }
+
+    #game-container {
+      perspective: 1000px;
+    }
+
+    #game-board {
+      display: grid;
+      grid-template-columns: repeat(4, 100px);
+      gap: 10px;
+      transform-style: preserve-3d;
+      transition: transform 0.5s ease-in-out;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      width: 100px;
+      height: 100px;
+      background-color:#00cfda;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 24px;
+      cursor: pointer;
+      user-select: none;
+      transform-style: preserve-3d;
+      transition: transform 0.5s ease-in-out;
+    }
+
+    .flipped, .matched {
+      background-color: #2ecc71;
+      transform: rotateY(180deg);
+    }
+
+    #timer {
+      font-size: 18px;
+      color: #fff;
+      margin-bottom: 20px;
+    }
+
+    #game-name {
+      font-size: 36px;
+      color: #fff;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+    }
+
+    #instructions {
+      font-size: 24px; /* Increased font size */
+      color: #fff;
+      text-align: center; /* Centered text */
+      max-width: 400px;
+      line-height: 1.5;
+      margin-bottom: 20px; /* Added margin for separation */
+      font-family: 'Georgia', serif; /* Stylish font */
+    }
+
+    #copyright {
+      font-size: 14px;
+      color: #fff;
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="timer">Time Left: 20 seconds</div>
+<div id="game-name">Wordflipzz</div>
+
+<div id="game-container">
+  <div id="game-board"></div>
+</div>
+
+<div id="instructions">
+  <p>Welcome to Wordflipzz! Click on a card to flip it. Match all pairs before the time runs out.</p>
+</div>
+
+<div id="copyright">&copy; 2024 SARANRAM KARTHIKEYAN. All rights reserved.</div>
+
+<script>
+  let timer;
+  let secondsLeft = 20;
+
+  // Shuffle function to randomize the order of the cards
+  function shuffle(array) {
+    let currentIndex = array.length, randomIndex;
+
+    while (currentIndex !== 0) {
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex--;
+
+      [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+    }
+
+    return array;
+  }
+
+  // Create an array with pairs of cards
+  const cards = ['A', 'A', 'B', 'B', 'C', 'C', 'D', 'D', 'E', 'E', 'F', 'F', 'G', 'G', 'H', 'H'];
+
+  // Shuffle the cards
+  const shuffledCards = shuffle(cards);
+
+  const gameContainer = document.getElementById('game-container');
+  const gameBoard = document.getElementById('game-board');
+  const timerElement = document.getElementById('timer');
+  let flippedCards = [];
+  let matchedPairs = 0;
+
+  // Create and display cards on the game board
+  shuffledCards.forEach((card, index) => {
+    const cardElement = document.createElement('div');
+    cardElement.classList.add('card');
+    cardElement.setAttribute('data-index', index);
+    cardElement.textContent = card;
+
+    cardElement.addEventListener('click', () => {
+      startTimer();
+      flipCard(cardElement);
+    });
+
+    gameBoard.appendChild(cardElement);
+  });
+
+  // Function to handle card flipping
+  function flipCard(cardElement) {
+    if (flippedCards.length < 2 && !flippedCards.includes(cardElement)) {
+      cardElement.classList.add('flipped');
+      flippedCards.push(cardElement);
+
+      if (flippedCards.length === 2) {
+        setTimeout(checkMatch, 1000);
+      }
+    }
+  }
+
+  // Function to start the timer
+  function startTimer() {
+    if (!timer) {
+      timer = setInterval(() => {
+        secondsLeft--;
+        timerElement.textContent = `Time Left: ${secondsLeft} seconds`;
+
+        if (secondsLeft === 0) {
+          clearInterval(timer);
+          alert('Time is up! Click "Retry" to play again.');
+          resetGame();
+        }
+      }, 1000);
+    }
+  }
+
+  // Function to check if the flipped cards match
+  function checkMatch() {
+    const [card1, card2] = flippedCards;
+    const index1 = parseInt(card1.getAttribute('data-index'));
+    const index2 = parseInt(card2.getAttribute('data-index'));
+
+    if (shuffledCards[index1] === shuffledCards[index2]) {
+      card1.classList.add('matched');
+      card2.classList.add('matched');
+      matchedPairs++;
+
+      if (matchedPairs === cards.length / 2) {
+        clearInterval(timer);
+        alert('Congratulations! You matched all pairs.');
+        resetGame();
+      }
+    } else {
+      card1.classList.remove('flipped');
+      card2.classList.remove('flipped');
+    }
+
+    flippedCards = [];
+  }
+
+  // Function to reset the game
+  function resetGame() {
+    gameBoard.innerHTML = '';
+    matchedPairs = 0;
+    flippedCards = [];
+    secondsLeft = 20;
+    clearInterval(timer);
+    timer = null;
+
+    const reshuffledCards = shuffle(cards);
+
+    reshuffledCards.forEach((card, index) => {
+      const cardElement = document.createElement('div');
+      cardElement.classList.add('card');
+      cardElement.setAttribute('data-index', index);
+      cardElement.textContent = card;
+
+      cardElement.addEventListener('click', () => {
+        startTimer();
+        flipCard(cardElement);
+      });
+
+      gameBoard.appendChild(cardElement);
+    });
+  }
+
+  // Add shuffling effect between levels
+  function shuffleCardsWithEffect() {
+    gameBoard.style.transform = 'rotateY(180deg)';
+    setTimeout(() => {
+      gameBoard.innerHTML = '';
+      const reshuffledCards = shuffle(cards);
+
+      reshuffledCards.forEach((card, index) => {
+        const cardElement = document.createElement('div');
+        cardElement.classList.add('card');
+        cardElement.setAttribute('data-index', index);
+        cardElement.textContent = card;
+
+        cardElement.addEventListener('click', () => {
+          startTimer();
+          flipCard(cardElement);
+        });
+
+        gameBoard.appendChild(cardElement);
+      });
+
+      gameBoard.style.transform = 'rotateY(0deg)';
+    }, 500);
+  }
+</script>
+
+</body>
+</html>
