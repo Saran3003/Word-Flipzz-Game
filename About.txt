@@ -1,0 +1,34 @@
+////Game Functionality:
+Card Display and Interaction:
+
+The shuffle function randomizes the order of the cards.
+Each card is represented by a <div> element with a specific class and data attributes.
+Clicking on a card triggers the flipCard function, which flips the card, reveals the symbol, and starts the timer.
+Timer Countdown:
+
+The startTimer function initializes a countdown timer.
+The timer is displayed on the webpage, updating every second.
+If the timer reaches zero, an alert is displayed, prompting the player to retry the game.
+Matching Logic:
+
+When two cards are flipped (flippedCards array has two elements), the checkMatch function is called after a 1-second delay.
+The function compares the symbols of the flipped cards.
+If the symbols match, the cards are marked as "matched," and the matchedPairs counter increases.
+If all pairs are matched, a congratulations alert is displayed, and the game is reset.
+Game Reset:
+
+The resetGame function resets the game state.
+It clears the game board, reshuffles the cards, resets the timer, and sets up event listeners for the new cards.
+Shuffling Effect:
+
+The shuffleCardsWithEffect function adds a shuffling effect between levels.
+It rotates the game board by 180 degrees, clears the board, shuffles the cards, and rotates the board back to 0 degrees.
+Game Flow:
+Player clicks on a card to flip it.
+Timer starts counting down from 20 seconds.
+Player clicks on a second card to reveal its symbol.
+The game checks if the symbols match.
+If yes, cards stay flipped, and the player aims to match the next pair.
+If no, cards flip back face-down.
+Player repeats the process until all pairs are matched or the timer runs out.
+A congratulatory message or a time-up alert is displayed, and the player can choose to retry.
